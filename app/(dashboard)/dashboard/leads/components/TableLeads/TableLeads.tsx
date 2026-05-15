@@ -84,8 +84,7 @@ export const TableLeads = (props: TableLeadsProps) => {
                                             }}>
                                                 <Trash className='w-3 h-3'/>
                                             </Button>
-                                            <Checkbox checked={isChecked} onCheckedChange={async () => {
-                                                
+                                            <Checkbox checked={lead.completed} onCheckedChange={async () => {
                                                 try {
                                                     const checked = !isChecked
                                                     setIsChecked(!isChecked)

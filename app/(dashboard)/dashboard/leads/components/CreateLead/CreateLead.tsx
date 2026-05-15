@@ -13,9 +13,9 @@ import { z } from "zod"
 import { Controller, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { formSchema } from "./CreateLead.form"
-import { createLead } from "./actions/actions"
+import { createLead, searchLeads } from "./actions/actions"
 import { toast } from "sonner"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 export const CreateLead = () => {
     const [isOpen, setIsOpen] = useState<boolean>(false)
@@ -46,11 +46,10 @@ export const CreateLead = () => {
     }
 
     return (
-        <div className="flex justify-end gap-6 px-6">
             <Dialog open={isOpen} onOpenChange={setIsOpen}>
                 <DialogTrigger asChild>
                     <Button>
-                        Añadir lead
+                        <p className="hidden md:block">Añadir lead</p>
                         <PlusCircle className="w-4 h-4" />
                     </Button>
                 </DialogTrigger>
@@ -109,6 +108,5 @@ export const CreateLead = () => {
                     </form>
                 </DialogContent>
             </Dialog>
-        </div>
     )
 }

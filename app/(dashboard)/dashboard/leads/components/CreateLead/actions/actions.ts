@@ -26,7 +26,7 @@ export async function createLead(values: z.infer<typeof formSchema>) {
     }
 }
 
-export async function getLeads() {
+export async function searchLeads(search?: string, status?: string) {
     try {
         const { userId } = await auth()
 
@@ -36,16 +36,24 @@ export async function getLeads() {
 
         const leads = await prisma.lead.findMany({
             where: {
-                userId
-            },
-            orderBy: {
-                createdAt: 'asc'
+                userId,
+                ...(status && { status }),
+                ...(search && {
+                    OR: [
+                        { name: { contains: search, mode: 'insensitive' } },
+                        { phone: { contains: search, mode: 'insensitive' } },
+                        { email: { contains: search, mode: 'insensitive' } },
+                        { businessName: { contains: search, mode: 'insensitive' } },
+                        { title: { contains: search, mode: 'insensitive' } },
+                        { description: { contains: search, mode: 'insensitive' } }
+                    ]
+                })
             }
         })
 
         return leads
-    } catch(error){
-        console.error("LEADS GET", error)
+    } catch (error) {
+        console.error("LEAD SEARCH", error)
         throw new Error('Internal server error')
     }
-} 
+}

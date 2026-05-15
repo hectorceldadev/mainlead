@@ -52,3 +52,44 @@ export async function completedLead(leadId: string, state: boolean) {
         throw new Error('Internal server error')
     }
 }
+
+export async function getLeads(q?: string, status?: string) {
+    try {
+        const { userId } = await auth()
+
+        if (!userId) {
+            throw new Error('Unauthorized')
+        }
+
+        const isCompleted = status === 'completed'
+
+        const leads = await prisma.lead.findMany({
+            where: {
+                userId,
+                ...(isCompleted
+                    ? { completed: true }
+                    : { completed: false }
+                ),
+                ...(!isCompleted && status && { status }),
+                ...(q && {
+                    OR: [
+                        { name: { contains: q, mode: 'insensitive' } },
+                        { businessName: { contains: q, mode: 'insensitive' } },
+                        { title: { contains: q, mode: 'insensitive' } },
+                        { description: { contains: q, mode: 'insensitive' } },
+                        { email: { contains: q, mode: 'insensitive' } },
+                        { phone: { contains: q, mode: 'insensitive' } },
+                    ]
+                })
+            },
+            orderBy: {
+                createdAt: 'asc'
+            }
+        })
+
+        return leads
+    } catch (error) {
+        console.error("LEAD GET", error)
+        throw new Error('Internal server error')
+    }
+}

@@ -12,6 +12,19 @@ datasource db {
   provider = "postgresql"
 }
 
+model User {
+  id String @id @default(uuid())
+  userId String
+  username String
+  credits Int @default(20)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  leads Lead[]
+
+  @@unique([userId])
+}
+
 model Lead {
   id String @id @default(uuid())
 
@@ -28,7 +41,9 @@ model Lead {
   completed Boolean @default(false)
 
   userId String
+  user User @relation(fields: [userId], references: [userId], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  
 }
