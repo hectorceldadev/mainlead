@@ -3,6 +3,7 @@
 import { AnimateIcon } from "@/components/animate-ui/icons/icon"
 import { Users } from "@/components/animate-ui/icons/users"
 import { Button } from "@/components/ui/button"
+import { HistoryIcon } from "@/components/ui/history"
 import { HomeIcon, HomeIconHandle } from "@/components/ui/home"
 import { LogoutIcon } from "@/components/ui/logout"
 import { SearchIcon } from "@/components/ui/search"
@@ -29,6 +30,7 @@ export function AppSidebar() {
     const settingsIconRef = useRef<HomeIconHandle>(null)
     const logoutIconRef = useRef<HomeIconHandle>(null)
     const searchIconRef = useRef<HomeIconHandle>(null)
+    const historyIconRef = useRef<HomeIconHandle>(null)
 
     return (
         <Sidebar variant="floating">
@@ -63,6 +65,15 @@ export function AppSidebar() {
                         >
                             <SearchIcon ref={searchIconRef} size={16} />
                             Find leads
+                        </SidebarMenuItem>
+
+                        <SidebarMenuItem 
+                            onClick={() => router.push('/dashboard/history-leads')} className="flex gap-2 items-center dark:hover:bg-white/10 hover:bg-black/10 px-3 py-1.5 rounded-md cursor-pointer group"
+                            onMouseEnter={() => historyIconRef.current?.startAnimation()}
+                            onMouseLeave={() => historyIconRef.current?.stopAnimation()}
+                        >
+                            <HistoryIcon ref={historyIconRef} size={16} />
+                            History leads
                         </SidebarMenuItem>
                     </SidebarMenu>
                     
