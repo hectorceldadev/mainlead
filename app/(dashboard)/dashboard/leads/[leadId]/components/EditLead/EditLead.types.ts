@@ -1,3 +1,5 @@
+import { Prisma } from "@/lib/generated/prisma/client"
+import { UseFormReturn } from "react-hook-form"
 import { z } from "zod"
 
 export const formSchema = z.object({
@@ -25,3 +27,15 @@ export const formSchema = z.object({
         'CLOSED',
     ]),
 })
+
+export type LeadWithRelations = Prisma.LeadGetPayload<{
+    include: {
+        company: true,
+        contact: true
+    }
+}>
+
+export type EditLeadProps = {
+    lead: LeadWithRelations
+    form: UseFormReturn<z.infer<typeof formSchema>>
+}

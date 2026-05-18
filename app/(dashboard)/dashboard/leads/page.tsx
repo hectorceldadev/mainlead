@@ -1,12 +1,12 @@
+import { LeadStatus } from "@/lib/generated/prisma/client";
 import { HeaderComponent } from "../components/HeaderComponent";
 import { CreateLead, SearchLeads, TableLeads } from "./components";
 import { getLeads } from "./components/TableLeads/actions/actions";
 
-export default async function LeadsPage({ searchParams }: { searchParams: Promise<{q?: string, status: string}> }) {
+export default async function LeadsPage({ searchParams }: { searchParams: Promise<{q?: string, status: LeadStatus}> }) {
     const { q, status } = await searchParams
 
     const leads = await getLeads(q, status)
-    console.log(leads)
 
     return (
         <div className="flex flex-col justify-center mx-auto w-full space-y-8">
