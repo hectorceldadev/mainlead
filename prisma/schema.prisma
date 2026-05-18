@@ -12,38 +12,107 @@ datasource db {
   provider = "postgresql"
 }
 
+enum LeadStatus {
+  COLD 
+  TEMPERED
+  HOT 
+  CLOSED
+}
+
+enum LeadSource {
+  MANUAL
+  GOOGLE_PLACES
+}
+
 model User {
   id String @id @default(uuid())
+
   userId String
   username String
+
   credits Int @default(20)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   leads Lead[]
+  companies Company[]
+  contacts Contact[]
 
   @@unique([userId])
+}
+
+model Company {
+  id String @id @default(uuid())
+
+  placeId String? @unique
+
+  name String
+  location String?
+
+  phone String?
+  email String?
+
+  websiteUrl String?
+
+  userId String
+  user User @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  contacts Contact[]
+  leads Lead[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model Contact {
+  id String @id @default(uuid())
+
+  name String
+
+  role String?
+
+  email String?
+  phone String?
+
+  companyId String?
+  company Company? @relation(fields: [companyId], references: [id], onDelete: SetNull)
+
+  userId String
+  user User @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  leads Lead[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
 }
 
 model Lead {
   id String @id @default(uuid())
 
-  title String 
+  status LeadStatus @default(COLD)
+
+  title String?
   description String?
 
-  name String
-  businessName String
-  phone String?
-  email String?
+  source LeadSource @default(MANUAL)
 
-  status String 
+  companyId String?
+  company Company? @relation(fields: [companyId], references: [id], onDelete: SetNull)
 
-  completed Boolean @default(false)
+  contactId String?
+  contact Contact? @relation(fields: [contactId], references: [id], onDelete: SetNull)
 
   userId String
   user User @relation(fields: [userId], references: [userId], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  
+
+  @@index([userId])
+  @@index([status])
 }

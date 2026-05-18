@@ -43,10 +43,10 @@ export const SearchLeads = () => {
                     </SelectTrigger>
                     <SelectContent>
                         <SelectGroup>
-                            <SelectItem className="text-blue-500" value="cold">Frío</SelectItem>
-                            <SelectItem className="text-orange-500" value="tempered">Templado</SelectItem>
-                            <SelectItem className="text-red-500" value="hot">Caliente</SelectItem>
-                            <SelectItem className="text-emerald-500" value="completed">Cerrados</SelectItem>
+                            <SelectItem className="text-blue-500" value="COLD">Frío</SelectItem>
+                            <SelectItem className="text-orange-500" value="TEMPERED">Templado</SelectItem>
+                            <SelectItem className="text-red-500" value="HOT">Caliente</SelectItem>
+                            <SelectItem className="text-emerald-500" value="CLOSED">Cerrados</SelectItem>
                         </SelectGroup>
                     </SelectContent>
                 </Select>
