@@ -56,6 +56,7 @@ export const SearchLeads = () => {
                 })
             })
 
+            
             const data = await response.json()
 
             if (data.status === false) {
@@ -86,7 +87,7 @@ export const SearchLeads = () => {
                     <FieldGroup className="gap-2 md:flex-row md:gap-4">
                         <Field className="">
                             <FieldLabel htmlFor="location"><MapPin className="w-4 h-4"/>Localización</FieldLabel>
-                            <Input {...form.register('location')} id="location" placeholder="Madrid, Valencia..." />
+                            <Input {...form.register('location')} id="location" placeholder="Barrio de Salamanca, Madrid..." />
                             
                         </Field>
                         <Field>

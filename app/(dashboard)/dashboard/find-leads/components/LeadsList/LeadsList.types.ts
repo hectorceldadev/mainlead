@@ -8,4 +8,5 @@ export type LeadPlacesAPIProps = {
     types: string[]
     userRatingCount: number
     websiteUri: string
+    alreadySaved: boolean
 }

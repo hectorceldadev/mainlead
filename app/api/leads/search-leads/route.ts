@@ -1,4 +1,5 @@
 import { formSchema } from "@/app/(dashboard)/dashboard/find-leads/components/SearchLeads/SearchLeads.form"
+import { prisma } from "@/lib/prisma"
 import { auth } from "@clerk/nextjs/server"
 import { NextResponse } from "next/server"
 import { z } from "zod"
@@ -45,9 +46,52 @@ export async function POST(req: Request) {
             )
         }
 
+        const places = data.places ?? []
+
+        await prisma.historyCompany.createMany({
+            data: places.map((place: {
+                id: string
+                displayName: { text: string }
+                formattedAddress?: string
+                rating?: number,
+                websiteUri?: string
+                nationalPhoneNumber?: string
+            }) => ({
+                placeId: place.id,
+                name: place.displayName.text,
+                location: place.formattedAddress,
+                phone: place.nationalPhoneNumber,
+                websiteUrl: place.websiteUri,
+                rating: place.rating,
+                source: 'GOOGLE_PLACES',
+                userId
+            })),
+            skipDuplicates: true
+        })
+
+        const placesIds = places.map((place: { id: string }) => place.id)
+
+        const historyRecords = await prisma.historyCompany.findMany({
+            where: {
+                userId,
+                placeId: { in: placesIds }
+            },
+            select: {
+                placeId: true,
+                savedCompanyId: true
+            }
+        })
+
+        const historyMap = new Map(historyRecords.map(r => [r.placeId, r]))
+
+        const placesWithStatus = places.map((place: { id: string }) => ({
+            ...place,
+            alreadySaved: historyMap.get(place.id)?.savedCompanyId != null
+        }))
+
         return NextResponse.json({
             status: true,
-            data
+            data: { places: placesWithStatus }
         })
     } catch (error) {
         console.error("PLACES API", error)

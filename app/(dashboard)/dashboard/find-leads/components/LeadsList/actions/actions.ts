@@ -3,6 +3,7 @@
 import { prisma } from "@/lib/prisma"
 import { auth } from "@clerk/nextjs/server"
 import { CreateCompanyProps } from "./CreateCompany.types"
+import { revalidatePath } from "next/cache"
 
 export async function CreateCompany(company: CreateCompanyProps) {
     try {
@@ -33,9 +34,25 @@ export async function CreateCompany(company: CreateCompanyProps) {
             }
         })
 
+        
         if (!companyDB) {
-            throw new Error('Error guardando lead')
+            throw Error        
         }
+        
+        if (company.placeId) {
+            await prisma.historyCompany.updateMany({
+                where: {
+                    userId,
+                    placeId: company.placeId
+                },
+                data: {
+                    savedCompanyId: companyDB.id
+                }
+            })
+        }
+
+        revalidatePath(`/dashboard/history-leads`)
+        revalidatePath(`/dashboard/leads`)
 
         return companyDB
     } catch (error) {
