@@ -53,7 +53,8 @@ export async function POST(req: Request) {
                 id: string
                 displayName: { text: string }
                 formattedAddress?: string
-                rating?: number,
+                rating?: number
+                userRatingCount?: number
                 websiteUri?: string
                 nationalPhoneNumber?: string
             }) => ({
@@ -63,6 +64,7 @@ export async function POST(req: Request) {
                 phone: place.nationalPhoneNumber,
                 websiteUrl: place.websiteUri,
                 rating: place.rating,
+                userRatingCount: place.userRatingCount,
                 source: 'GOOGLE_PLACES',
                 userId
             })),

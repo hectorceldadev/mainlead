@@ -1,9 +1,10 @@
 'use server'
 
+// import { LeadSource } from "@/lib/generated/prisma/enums"
 import { prisma } from "@/lib/prisma"
 import { auth } from "@clerk/nextjs/server"
 
-export async function getHistoryCompanies(q: string) {
+export async function getHistoryCompanies(q: string, {/* source: LeadSource */}) {
     try {
         const { userId } = await auth()
 
@@ -14,6 +15,7 @@ export async function getHistoryCompanies(q: string) {
         const historyCompanies = await prisma.historyCompany.findMany({
             where: {
                 userId,
+                // ...(source && { source }),
                 ...(q && {
                     OR: [
                         { name: { contains: q, mode: 'insensitive' } },
@@ -22,9 +24,9 @@ export async function getHistoryCompanies(q: string) {
                         { websiteUrl: { contains: q, mode: 'insensitive' } },
                         { email: { contains: q, mode: 'insensitive' } }
                     ]
-                }),
-                savedCompanyId: null
-            }
+                })
+            },
+            orderBy: { createdAt: 'desc' }
         })
 
         return historyCompanies
