@@ -1,37 +1,20 @@
 'use client'
 
-import { Globe, Phone, Star, Verified } from "lucide-react"
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table"
-
-import {
-    Card,
-    CardContent,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card"
-
+import { HistoryCompany } from "@/lib/generated/prisma/client"
+import { HistoryListProps } from "./HistoryList.types"
 import { Button } from "@/components/ui/button"
-
-import { LeadPlacesAPIProps } from "./LeadsList.types"
-import { useLeads } from "../../context/Leads.context"
-import { Users } from "@/components/animate-ui/icons/users"
-import { CreateCompany } from "./actions/actions"
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
+import { TableHeader, TableRow, TableHead, TableBody, TableCell, Table } from "@/components/ui/table"
+import { Phone, Globe, Star } from "lucide-react"
 import { toast } from "sonner"
-import { CreateCompanyProps } from "./actions/CreateCompany.types"
-import { Badge } from "@/components/ui/badge"
+import { CreateCompany } from "../../../find-leads/components/LeadsList/actions/actions"
+import { CreateCompanyProps } from "../../../find-leads/components/LeadsList/actions/CreateCompany.types"
+import { Users } from "@/components/animate-ui/icons/users"
 
-
-export const LeadsList = () => {
-    const { leads } = useLeads()
-
-    if (leads.length === 0) {
+export const HistoryList = (props: HistoryListProps) => {
+    const { historyList } = props 
+    
+    if (historyList.length === 0) {
         return (
             <div className="flex flex-col justify-center items-center mt-20 gap-3">
                 <Users animateOnHover className="size-14 text-muted-foreground" />
@@ -42,7 +25,7 @@ export const LeadsList = () => {
                     </p>
 
                     <p className="text-sm text-muted-foreground">
-                        Los leads aparecerán aquí cuando hagas una búsqueda
+                        Los historyList aparecerán aquí cuando hagas una búsqueda
                     </p>
                 </div>
             </div>
@@ -54,7 +37,7 @@ export const LeadsList = () => {
             <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                     <Users animateOnHover className="size-5" />
-                    Leads encontrados ({leads.length})
+                    Historial no guardado ({historyList.length})
                 </CardTitle>
             </CardHeader>
 
@@ -73,17 +56,17 @@ export const LeadsList = () => {
                         </TableHeader>
 
                         <TableBody>
-                            {leads.map((lead: LeadPlacesAPIProps) => (
+                            {historyList.map((lead: HistoryCompany) => (
                                 <TableRow key={lead.id}>
                                     {/* NEGOCIO */}
                                     <TableCell className="min-w-[250px]">
                                         <div className="flex flex-col gap-1">
                                             <p className="font-medium">
-                                                {lead.displayName.text}
+                                                {lead.name}
                                             </p>
 
                                             <p className="text-sm text-muted-foreground line-clamp-2">
-                                                {lead.formattedAddress}
+                                                {lead.location}
                                             </p>
                                         </div>
                                     </TableCell>
@@ -91,19 +74,19 @@ export const LeadsList = () => {
                                     {/* CONTACTO */}
                                     <TableCell>
                                         <div className="flex flex-col gap-2">
-                                            {lead.nationalPhoneNumber && (
+                                            {lead.phone && (
                                                 <a
-                                                    href={`tel:${lead.nationalPhoneNumber}`}
+                                                    href={`tel:${lead.phone}`}
                                                     className="flex items-center gap-2 text-sm hover:underline"
                                                 >
                                                     <Phone className="size-4" />
-                                                    {lead.nationalPhoneNumber}
+                                                    {lead.phone}
                                                 </a>
                                             )}
 
-                                            {lead.websiteUri && (
+                                            {lead.websiteUrl && (
                                                 <a
-                                                    href={lead.websiteUri}
+                                                    href={lead.websiteUrl}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
                                                     className="flex items-center gap-2 text-sm hover:underline text-blue-500"
@@ -124,7 +107,7 @@ export const LeadsList = () => {
                                             </div>
 
                                             <p className="text-sm text-muted-foreground">
-                                                {lead.userRatingCount || 0} reviews
+                                                {lead.rating || 0} reviews
                                             </p>
                                         </div>
                                     </TableCell>
@@ -132,14 +115,14 @@ export const LeadsList = () => {
                                     {/* ACCIONES */}
                                     <TableCell className="text-right">
                                         <div className="flex justify-end items-center gap-2">
-                                            {lead.websiteUri && (
+                                            {lead.websiteUrl && (
                                                 <Button
                                                     asChild
                                                     variant="outline"
                                                     size="sm"
                                                 >
                                                     <a
-                                                        href={lead.websiteUri}
+                                                        href={lead.websiteUrl}
                                                         target="_blank"
                                                         rel="noopener noreferrer"
                                                     >
@@ -148,21 +131,17 @@ export const LeadsList = () => {
                                                 </Button>
 
                                             )}
-                                            {lead?.alreadySaved ? (
-                                                <Badge className="badge-saved inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full">
-                                                    <Verified className="size-3" />
-                                                    Guardado
-                                                </Badge>
-                                            ) : (
+                                            
                                                 <Button
+                                                    className="cursor-pointer"
                                                     onClick={async () => {
                                                         try {
                                                             const company: CreateCompanyProps = {
                                                                 placeId: lead.id,
-                                                                name: lead.displayName.text,
-                                                                location: lead.formattedAddress || null,
-                                                                phone: lead.nationalPhoneNumber || null,
-                                                                websiteUrl: lead.websiteUri || null,
+                                                                name: lead.name,
+                                                                location: lead.location || null,
+                                                                phone: lead.phone || null,
+                                                                websiteUrl: lead.websiteUrl || null,
                                                             }
 
                                                             const companyDB = await CreateCompany(company)
@@ -178,7 +157,6 @@ export const LeadsList = () => {
                                                 >
                                                     Guardar
                                                 </Button>
-                                            )}
                                         </div>
                                     </TableCell>
                                 </TableRow>

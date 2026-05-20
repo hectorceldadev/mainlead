@@ -22,6 +22,7 @@ enum LeadStatus {
 enum LeadSource {
   MANUAL
   GOOGLE_PLACES
+  LINKEDIN
 }
 
 model User {
@@ -39,6 +40,9 @@ model User {
   companies Company[]
   contacts Contact[]
 
+  historyCompanies HistoryCompany[]
+  historyContacts HistoryContact[]
+
   @@unique([userId])
 }
 
@@ -54,6 +58,8 @@ model Company {
   email String?
 
   websiteUrl String?
+
+  historyCompanies HistoryCompany[]
 
   userId String
   user User @relation(fields: [userId], references: [userId], onDelete: Cascade)
@@ -79,6 +85,8 @@ model Contact {
 
   companyId String?
   company Company? @relation(fields: [companyId], references: [id], onDelete: SetNull)
+
+  historyContacts HistoryContact[]
 
   userId String
   user User @relation(fields: [userId], references: [userId], onDelete: Cascade)
@@ -115,4 +123,63 @@ model Lead {
 
   @@index([userId])
   @@index([status])
+}
+
+model HistoryCompany {
+  id String @id @default(uuid())
+
+  placeId String?
+  linkedInId String?
+
+  name String
+  location String?
+  phone String?
+  email String?
+  websiteUrl String?
+  rating Float?
+
+  source LeadSource
+
+  savedCompanyId String?
+  savedCompany Company? @relation(fields: [savedCompanyId], references: [id], onDelete: SetNull)
+
+  userId String
+  user User @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  historyContacts HistoryContact[]
+
+  createdAt DateTime @default(now())
+
+  @@unique([placeId])
+  @@unique([linkedInId])
+  @@index([userId])
+  @@index([source])
+  @@index([userId, savedCompanyId])
+}
+
+model HistoryContact {
+  id String  @id @default(uuid())
+
+  linkedInUrl String?  
+
+  name String
+  role String?
+  email String?
+  phone String?
+
+  source LeadSource
+
+  historyCompanyId String?
+  historyCompany HistoryCompany? @relation(fields: [historyCompanyId], references: [id], onDelete: SetNull)
+
+  savedContactId String?
+  savedContact Contact? @relation(fields: [savedContactId], references: [id], onDelete: SetNull)
+
+  userId String
+  user User @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([source])
 }

@@ -4,14 +4,14 @@ import { z } from "zod"
 
 export const formSchema = z.object({
     // COMPANY
-    companyName: z.string().min(1),
+    companyName: z.string().optional(),
     companyPhone: z.string().optional(),
     companyEmail: z.string().optional(),
     companyWebsite: z.string().optional(),
     companyLocation: z.string().optional(),
 
     // CONTACT
-    contactName: z.string().min(1),
+    contactName: z.string().optional(),
     contactRole: z.string().optional(),
     contactPhone: z.string().optional(),
     contactEmail: z.string().optional(),

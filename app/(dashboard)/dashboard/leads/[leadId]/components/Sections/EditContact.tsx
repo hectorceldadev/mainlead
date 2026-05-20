@@ -19,7 +19,10 @@ export const EditContact = (props: EditLeadProps) => {
                             <User className="w-4 h-4" />
                             Nombre
                         </FieldLabel>
-                        <Input placeholder={lead.contact?.name} {...form.register('contactName')}/>
+                        <Input placeholder={lead.contact?.name || 'Andrés Rodríguez'} {...form.register('contactName')}/>
+                        {form.formState.errors.contactName && (
+                            <p className="text-red-500 text-xs">{form.formState.errors.contactName.message}</p>
+                        )}
                     </Field>
                     <Field>
                         <FieldLabel className="flex items-center gap-2">

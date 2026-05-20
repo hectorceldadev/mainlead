@@ -9,7 +9,7 @@ export default async function LeadsPage({ searchParams }: { searchParams: Promis
     const leads = await getLeads(q, status)
 
     return (
-        <div className="flex flex-col justify-center mx-auto w-full space-y-8">
+        <div className="flex flex-col justify-center mx-auto w-full space-y-6">
             <HeaderComponent title="Leads" />
             <div className="flex justify-end gap-6 px-6">
                 <SearchLeads />

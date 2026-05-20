@@ -2,15 +2,17 @@
 
 import { EditLeadProps, formSchema } from "./EditLead.types"
 import { EditCompany, EditContact, EditPipeline } from "../Sections"
-import { Card } from "@/components/ui/card"
 import { z } from "zod"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
+import { updateLead } from "./actions/actions"
+import { useRouter } from "next/navigation"
 
 export function EditLead(props: EditLeadProps) {
     const { lead } = props
+    const router = useRouter()
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -36,7 +38,8 @@ export function EditLead(props: EditLeadProps) {
 
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
         try {
-            console.log(values)
+            await updateLead(lead.id, values)
+            router.push('/dashboard/leads')
             toast.success('Lead actualizado con éxito')
         } catch (error) {
             console.error(error)
