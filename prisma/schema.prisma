@@ -36,12 +36,16 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  stripeCustomerId String? @unique
+
   leads Lead[]
   companies Company[]
   contacts Contact[]
 
   historyCompanies HistoryCompany[]
   historyContacts HistoryContact[]
+
+  subscription Subscription?
 
   @@unique([userId])
 }
@@ -183,4 +187,25 @@ model HistoryContact {
 
   @@index([userId])
   @@index([source])
+}
+
+model Subscription {
+  id String @id @default(uuid())
+
+  planId String
+  status String
+  stripeSubscriptionId String @unique
+  stripePriceId String 
+  currentPeriodStart DateTime
+  currentPeriodEnd DateTime
+  creditsGranted Int @default(0)
+  cancelAtPeriodEnd Boolean @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  userId String @unique
+  user User @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([stripeSubscriptionId])
 }
