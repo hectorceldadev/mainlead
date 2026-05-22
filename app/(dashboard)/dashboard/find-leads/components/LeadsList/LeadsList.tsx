@@ -22,10 +22,10 @@ import { Button } from "@/components/ui/button"
 import { LeadPlacesAPIProps } from "./LeadsList.types"
 import { useLeads } from "../../context/Leads.context"
 import { Users } from "@/components/animate-ui/icons/users"
-import { CreateCompany } from "./actions/actions"
 import { toast } from "sonner"
-import { CreateCompanyProps } from "./actions/CreateCompany.types"
 import { Badge } from "@/components/ui/badge"
+import { CreateCompany } from "@/lib/actions/CreateCompany/actions/actions"
+import { CreateCompanyProps } from "@/lib/actions/CreateCompany/actions/CreateCompany.types"
 
 
 export const LeadsList = () => {

@@ -1,4 +1,4 @@
-import { formSchema } from "@/app/(dashboard)/dashboard/find-leads/components/SearchLeads/SearchLeads.form"
+import { getCredits } from "@/lib/actions/GetCredits/actions/actions"
 import { prisma } from "@/lib/prisma"
 import { auth } from "@clerk/nextjs/server"
 import { NextResponse } from "next/server"
@@ -18,9 +18,15 @@ export async function POST(req: Request) {
             return new NextResponse('Unauthorized', { status: 401 })
         }
         
-        
-
         const body = placesApiSchema.parse(await req.json())
+
+        const { pageSize } = body
+
+        const creditsDB = await getCredits()
+
+        if (creditsDB.credits < pageSize) {
+            throw new Error('No tienes creditos suficientes')
+        }
 
         const response = await fetch('https://places.googleapis.com/v1/places:searchText', {
             method: 'POST',
@@ -46,6 +52,16 @@ export async function POST(req: Request) {
             )
         }
 
+        await prisma.user.update({
+            where: {
+                userId,
+                credits: { gte: pageSize }
+            },
+            data: {
+                credits: { decrement: pageSize }
+            }
+        })
+
         const places = data.places ?? []
 
         await prisma.historyCompany.createMany({
@@ -53,7 +69,8 @@ export async function POST(req: Request) {
                 id: string
                 displayName: { text: string }
                 formattedAddress?: string
-                rating?: number,
+                rating?: number
+                userRatingCount?: number
                 websiteUri?: string
                 nationalPhoneNumber?: string
             }) => ({
@@ -63,6 +80,7 @@ export async function POST(req: Request) {
                 phone: place.nationalPhoneNumber,
                 websiteUrl: place.websiteUri,
                 rating: place.rating,
+                userRatingCount: place.userRatingCount,
                 source: 'GOOGLE_PLACES',
                 userId
             })),

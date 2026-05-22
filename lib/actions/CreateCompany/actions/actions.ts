@@ -13,8 +13,17 @@ export async function CreateCompany(company: CreateCompanyProps) {
             throw new Error('Unauthorized')
         }
 
-        const companyDB = await prisma.company.create({
-            data: {
+        const companyDB = await prisma.company.upsert({
+            where: {
+                placeId: company.placeId
+            },
+            update: {
+                name: company.name,
+                phone: company.phone,
+                websiteUrl: company.websiteUrl,
+                location: company.location
+            }, 
+            create: {
                 userId,
                 placeId: company.placeId,
                 name: company.name,

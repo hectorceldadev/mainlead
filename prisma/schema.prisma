@@ -137,6 +137,7 @@ model HistoryCompany {
   email String?
   websiteUrl String?
   rating Float?
+  userRatingCount Int?
 
   source LeadSource
 

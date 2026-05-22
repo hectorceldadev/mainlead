@@ -2,6 +2,7 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { AppSidebar } from "./dashboard/components";
 import { auth } from "@clerk/nextjs/server";
 import { checkUser } from "./actions/actions";
+import { getCredits } from "./dashboard/actions/actions";
 
 
 export default async function DashboardLayout({children}: {children: React.ReactNode}) {
@@ -18,11 +19,13 @@ export default async function DashboardLayout({children}: {children: React.React
         )
     }
 
+    const {credits} = await getCredits() 
+
     return (
         <SidebarProvider>
-            <AppSidebar />
+            <AppSidebar credits={credits}/>
             <main className="w-full">
-                <SidebarTrigger className="size-12"/>
+                <SidebarTrigger className="size-12 cursor-pointer"/>
                 {children}
             </main>
         </SidebarProvider>
