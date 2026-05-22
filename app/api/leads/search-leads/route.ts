@@ -7,7 +7,7 @@ import { z } from "zod"
 export const placesApiSchema = z.object({
     textQuery: z.string(),
     languageCode: z.string(),
-    pageSize: z.number()
+    pageSize: z.number().min(1).max(20)
 })
 
 export async function POST(req: Request) {
