@@ -20,15 +20,18 @@ import {
     SidebarMenuItem,
 } from "@/components/ui/sidebar"
 import { SignOutButton, UserButton } from "@clerk/nextjs"
-import { BowArrow,  LogOut, Settings } from "lucide-react"
+import { Coins } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useRef } from "react"
+import { SidebarProps } from "./Sidebar.types"
 
-export function AppSidebar() {
+
+export function AppSidebar(props: SidebarProps) {
+    const { credits } = props
+
     const router = useRouter()
     const homeIconRef = useRef<HomeIconHandle>(null)
     const settingsIconRef = useRef<HomeIconHandle>(null)
-    const logoutIconRef = useRef<HomeIconHandle>(null)
     const searchIconRef = useRef<HomeIconHandle>(null)
     const historyIconRef = useRef<HomeIconHandle>(null)
 
@@ -95,16 +98,10 @@ export function AppSidebar() {
             <SidebarFooter>
                 <div className="flex justify-between p-2 rounded-md">
                     <UserButton />
-                    <SignOutButton>
-                        <Button 
-                            variant={'destructive'}
-                            onMouseEnter={() => logoutIconRef.current?.startAnimation()}
-                            onMouseLeave={() => logoutIconRef.current?.stopAnimation()}
-                        >
-                            <LogoutIcon ref={logoutIconRef}/>
-                            Cerrar sesión
-                        </Button>
-                    </SignOutButton>
+                    <Button variant={'secondary'} className="font-semibold cursor-pointer" onClick={() => router.push('/dashboard/shop')}>
+                        <Coins className="w-3.5 h-3.5" />
+                        {credits}
+                    </Button>
                 </div>
             </SidebarFooter>
         </Sidebar>

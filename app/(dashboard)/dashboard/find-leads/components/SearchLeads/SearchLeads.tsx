@@ -26,11 +26,14 @@ import { formSchema } from "./SearchLeads.form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { toast } from "sonner"
 import { useLeads } from "../../context/Leads.context"
+import { useRouter } from "next/navigation"
 
 export const SearchLeads = () => {
     const searchIconRef = useRef<HomeIconHandle>(null)
 
     const { setLeads, isLoading, setIsLoading } = useLeads()
+
+    const router = useRouter()
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -65,6 +68,7 @@ export const SearchLeads = () => {
             } else {
                 toast.success('Leads obtenidos correctamente')
                 setLeads(data.data.places)
+                router.refresh()
                 console.log(data.data.places)
             }
 
@@ -88,12 +92,16 @@ export const SearchLeads = () => {
                         <Field className="">
                             <FieldLabel htmlFor="location"><MapPin className="w-4 h-4"/>Localización</FieldLabel>
                             <Input {...form.register('location')} id="location" placeholder="Barrio de Salamanca, Madrid..." />
-                            
+                            {form.formState.errors.location && (
+                                <p className="text-xs text-red-500">{form.formState.errors.location.message}</p>
+                            )}
                         </Field>
                         <Field>
                             <FieldLabel htmlFor="nicho"><Factory className="w-4 h-4"/>Nicho</FieldLabel>
                             <Input {...form.register('niche')} id="nicho" placeholder="Clínica dental, peluquería..."/>
-                            
+                            {form.formState.errors.niche && (
+                                <p className="text-xs text-red-500">{form.formState.errors.niche.message}</p>
+                            )}
                         </Field>
                         <Field>
                             <FieldLabel htmlFor="numresults"><Users className="w-4 h-4"/>N.º de resultados</FieldLabel>

@@ -3,6 +3,7 @@
 // import { LeadSource } from "@/lib/generated/prisma/enums"
 import { prisma } from "@/lib/prisma"
 import { auth } from "@clerk/nextjs/server"
+import { revalidatePath } from "next/cache"
 
 export async function getHistoryCompanies(q: string, {/* source: LeadSource */}) {
     try {
@@ -32,6 +33,32 @@ export async function getHistoryCompanies(q: string, {/* source: LeadSource */})
         return historyCompanies
     } catch (error) {
         console.error("GET HISTORY COMPANIES", error)
+        throw error
+    }
+}
+
+export async function deleteHistoryCompany(companyHistoryId: string) {
+    try {
+        const { userId } = await auth()
+
+        if (!userId) {
+            throw new Error('Unauthorized')
+        }
+
+        const deleteCompany = await prisma.historyCompany.delete({
+            where: {
+                userId,
+                id: companyHistoryId
+            }
+        })
+
+        if (!deleteCompany) {
+            return { delete: false }
+        }
+
+        return { delete: true }
+    } catch (error) {
+        console.error("DELETE COMPANY HISTORY", error)
         throw error
     }
 }

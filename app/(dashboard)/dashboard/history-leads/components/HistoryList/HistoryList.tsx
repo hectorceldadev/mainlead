@@ -10,12 +10,16 @@ import { toast } from "sonner"
 import { Users } from "@/components/animate-ui/icons/users"
 import { Badge } from "@/components/ui/badge"
 import { HistoryIcon } from "@/components/ui/history"
-import { CreateCompanyProps } from "@/lib/CreateCompany/actions/CreateCompany.types"
-import { CreateCompany } from "@/lib/CreateCompany/actions/actions"
+import { CreateCompanyProps } from "@/lib/actions/CreateCompany/actions/CreateCompany.types"
+import { CreateCompany } from "@/lib/actions/CreateCompany/actions/actions"
 import { useState } from "react"
+import { Trash2 } from "@/components/animate-ui/icons/trash-2"
+import { deleteHistoryCompany } from "../../actions/actions"
 
 export const HistoryList = (props: HistoryListProps) => {
     const [savingId, setSavingId] = useState<string | null>(null)
+    const [savedLocally, setSavedLocally] = useState<Set<string>>(new Set())
+    const [deletedLocally, setDeletedLocally] = useState<Set<string>>(new Set())
 
     const { historyList } = props
 
@@ -41,7 +45,7 @@ export const HistoryList = (props: HistoryListProps) => {
         <Card className="rounded-2xl border shadow-sm">
             <CardHeader>
                 <CardTitle className="flex items-center gap-1">
-                    <HistoryIcon size={20}/>
+                    <HistoryIcon size={20} />
                     Historial ({historyList.length})
                 </CardTitle>
             </CardHeader>
@@ -62,7 +66,9 @@ export const HistoryList = (props: HistoryListProps) => {
                         </TableHeader>
 
                         <TableBody>
-                            {historyList.map((lead: HistoryCompany) => (
+                            {historyList
+                                .filter(lead => !deletedLocally.has(lead.id))
+                                .map((lead: HistoryCompany) => (
                                 <TableRow key={lead.id}>
                                     {/* NEGOCIO */}
                                     <TableCell className="max-w-[300px]">
@@ -76,7 +82,7 @@ export const HistoryList = (props: HistoryListProps) => {
                                             </p>
                                         </div>
                                     </TableCell>
-                                    
+
 
                                     {/* CONTACTO */}
                                     <TableCell>
@@ -136,7 +142,7 @@ export const HistoryList = (props: HistoryListProps) => {
                                     {/* ACCIONES */}
                                     <TableCell className="text-right">
                                         <div className="flex justify-end items-center gap-2">
-                                            {lead.websiteUrl && (
+                                            {lead.websiteUrl ? (
                                                 <Button
                                                     asChild
                                                     variant="outline"
@@ -151,17 +157,45 @@ export const HistoryList = (props: HistoryListProps) => {
                                                     </a>
                                                 </Button>
 
+                                            ) : (
+                                                <Badge variant={'destructive'}>
+                                                    Sin web
+                                                </Badge>
                                             )}
 
-                                            {lead.savedCompanyId ? (
-                                                <Badge className="badge-saved inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full">
-                                                    <Verified />
-                                                    Guardado
-                                                </Badge>
+                                            {lead.savedCompanyId || savedLocally.has(lead.id) ? (
+                                                <div className="flex items-center gap-2">
+                                                    <Badge className="badge-saved inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full">
+                                                        <Verified />
+                                                        Guardado
+                                                    </Badge>
+                                                    <Button 
+                                                        className="cursor-pointer"
+                                                        variant={'destructive'} 
+                                                        size={'icon'} 
+                                                        onClick={async () => {
+                                                            try {
+                                                                const status = await deleteHistoryCompany(lead.id)
+
+                                                                if (!status.delete) {
+                                                                    toast.error('Error eliminando del historial')
+                                                                } else {
+                                                                    setDeletedLocally(prev => new Set(prev).add(lead.id))
+                                                                    toast.success('Eliminado del historial')
+                                                                }
+                                                            } catch (error) {
+                                                                console.error(error)
+                                                                toast.error('Error al eliminar el lead')
+                                                            }
+                                                        }}
+                                                    >
+                                                        <Trash2 animateOnHover/>
+                                                    </Button>
+                                                </div>
                                             ) : savingId === lead.id ? (
                                                 <Button variant={'outline'} disabled className="text-sm">
                                                     Guardando
-                                                    <LoaderCircle className="w-3 h-3 animate-spin"/>
+                                                    <LoaderCircle className="w-3 h-3 animate-spin" />
                                                 </Button>
                                             ) : (
                                                 <Button
@@ -170,16 +204,16 @@ export const HistoryList = (props: HistoryListProps) => {
                                                         setSavingId(lead.id)
                                                         try {
                                                             const company: CreateCompanyProps = {
-                                                                placeId: lead.placeId! ,
+                                                                placeId: lead.placeId!,
                                                                 name: lead.name,
                                                                 location: lead.location || null,
                                                                 phone: lead.phone || null,
                                                                 websiteUrl: lead.websiteUrl || null,
                                                             }
 
-                                                            const companyDB = await CreateCompany(company)
+                                                            await CreateCompany(company)
 
-                                                            console.log(companyDB)
+                                                            setSavedLocally(prev => new Set(prev).add(lead.id))
                                                             toast.success('Lead guardado correctamente')
                                                         } catch (error) {
                                                             console.error("CREATE COMPANY", error)

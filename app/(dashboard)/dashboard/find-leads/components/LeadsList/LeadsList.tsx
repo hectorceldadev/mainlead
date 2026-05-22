@@ -24,8 +24,8 @@ import { useLeads } from "../../context/Leads.context"
 import { Users } from "@/components/animate-ui/icons/users"
 import { toast } from "sonner"
 import { Badge } from "@/components/ui/badge"
-import { CreateCompany } from "@/lib/CreateCompany/actions/actions"
-import { CreateCompanyProps } from "@/lib/CreateCompany/actions/CreateCompany.types"
+import { CreateCompany } from "@/lib/actions/CreateCompany/actions/actions"
+import { CreateCompanyProps } from "@/lib/actions/CreateCompany/actions/CreateCompany.types"
 
 
 export const LeadsList = () => {
