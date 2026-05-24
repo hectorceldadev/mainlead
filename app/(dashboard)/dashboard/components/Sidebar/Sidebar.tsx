@@ -9,6 +9,7 @@ import { LogoutIcon } from "@/components/ui/logout"
 import { SearchIcon } from "@/components/ui/search"
 import { Separator } from "@/components/ui/separator"
 import { SettingsIcon } from "@/components/ui/settings"
+import { LayersIcon } from "@animateicons/react/lucide"
 import {
     Sidebar,
     SidebarContent,
@@ -19,7 +20,7 @@ import {
     SidebarMenu,
     SidebarMenuItem,
 } from "@/components/ui/sidebar"
-import { SignOutButton, UserButton } from "@clerk/nextjs"
+import { UserButton } from "@clerk/nextjs"
 import { Coins } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useRef } from "react"
@@ -34,6 +35,7 @@ export function AppSidebar(props: SidebarProps) {
     const settingsIconRef = useRef<HomeIconHandle>(null)
     const searchIconRef = useRef<HomeIconHandle>(null)
     const historyIconRef = useRef<HomeIconHandle>(null)
+    const planIconRef = useRef<HomeIconHandle>(null)
 
     return (
         <Sidebar variant="floating">
@@ -78,16 +80,24 @@ export function AppSidebar(props: SidebarProps) {
                             <HistoryIcon ref={historyIconRef} size={16} />
                             History leads
                         </SidebarMenuItem>
+                        <SidebarMenuItem 
+                            onClick={() => router.push('/dashboard/plans')} className="flex gap-2 items-center dark:hover:bg-white/10 hover:bg-black/10 px-3 py-1.5 rounded-md cursor-pointer group"
+                            onMouseEnter={() => planIconRef.current?.startAnimation()}
+                            onMouseLeave={() => planIconRef.current?.stopAnimation()}
+                        >
+                            <LayersIcon ref={planIconRef} size={16} />
+                            Plans
+                        </SidebarMenuItem>
                     </SidebarMenu>
                     
-                    <SidebarGroupLabel>Settings</SidebarGroupLabel>
+                    <SidebarGroupLabel>Configuration</SidebarGroupLabel>
                     <SidebarMenu>
                         <SidebarMenuItem 
                             onClick={() => router.push('/dashboard/settings')} className="flex gap-2 items-center dark:hover:bg-white/10 hover:bg-black/10 px-3 py-1.5 rounded-md cursor-pointer group"
                             onMouseEnter={() => settingsIconRef.current?.startAnimation()}
                             onMouseLeave={() => settingsIconRef.current?.stopAnimation()}
                         >
-                            <SettingsIcon ref={settingsIconRef} size={16} />
+                            <SettingsIcon ref={historyIconRef} size={16} />
                             Settings
                         </SidebarMenuItem>
                     </SidebarMenu>

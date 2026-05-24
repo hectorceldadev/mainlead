@@ -7,6 +7,8 @@ import { EditLeadProps } from "../EditLead/EditLead.types"
 export const EditCompany = (props: EditLeadProps) => {
     const { lead, form } = props
 
+    if (!form) return
+
     return (
         <Card>
             <CardHeader className="flex items-center gap-2 font-semibold text-lg">

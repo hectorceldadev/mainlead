@@ -48,6 +48,23 @@ export async function POST(req: Request) {
                     data: { credits: { increment: plan.credits } }
                 })
 
+                const stripeSubId = session.subscription as string
+                const stripeSub = await stripe.subscriptions.retrieve(stripeSubId)
+
+                await prisma.subscription.create({
+                    data: {
+                        planId: session.metadata!.planId,
+                        status: stripeSub.status,
+                        stripeSubscriptionId: stripeSub.id,
+                        stripePriceId: stripeSub.items.data[0].price.id,
+                        currentPeriodStart: new Date(stripeSub.start_date * 1000),
+                        currentPeriodEnd: new Date(stripeSub.start_date + 30 * 24 * 60 * 60 * 1000),
+                        creditsGranted: plan.credits,
+                        cancelAtPeriodEnd: stripeSub.cancel_at_period_end,
+                        userId,
+                    }
+                })
+
                 break
             }
 
@@ -69,7 +86,7 @@ export async function POST(req: Request) {
 
                 await prisma.user.update({
                     where: { userId: dbSub.userId },
-                    data: { credits: { increment: plan.credits } } 
+                    data: { credits: { increment: plan.credits } }
                 })
 
                 await prisma.subscription.update({
@@ -82,7 +99,7 @@ export async function POST(req: Request) {
 
             case "customer.subscription.updated": {
                 const sub = event.data.object as Stripe.Subscription
-                
+
                 const status = sub.status
                 const cancelAtPeriodEnd = sub.cancel_at_period_end
 
@@ -91,8 +108,8 @@ export async function POST(req: Request) {
                     data: {
                         status,
                         cancelAtPeriodEnd,
-                        currentPeriodStart: new Date((sub as any).current_period_start * 1000),
-                        currentPeriodEnd: new Date((sub as any).current_period_end * 1000),
+                        currentPeriodStart: new Date(sub.start_date * 1000),
+                        currentPeriodEnd:  new Date((sub.start_date + 30 * 24 * 60 * 60) * 1000),
                         stripePriceId: sub.items.data[0]?.price?.id ?? ""
                     }
                 })
@@ -111,9 +128,9 @@ export async function POST(req: Request) {
                 break
             }
 
-            return NextResponse.json({ recieved: true })
         }
-    } catch  (error) {
+        return NextResponse.json({ recieved: true })
+    } catch (error) {
         console.error("WEBHOOK ERROR", error)
         return NextResponse.json(
             { error: "Internal server error" },

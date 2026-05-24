@@ -37,5 +37,5 @@ export type LeadWithRelations = Prisma.LeadGetPayload<{
 
 export type EditLeadProps = {
     lead: LeadWithRelations
-    form: UseFormReturn<z.infer<typeof formSchema>>
+    form?: UseFormReturn<z.infer<typeof formSchema>>
 }
